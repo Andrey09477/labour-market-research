@@ -61,10 +61,8 @@ jobs_df[column.key_skills] = jobs_df[column.key_skills].apply(process_text)
 jobs_df[column.experience] = jobs_df[column.experience].apply(process_text)
 
 def process_text(text):
-  text = BeautifulSoup(text, 'html.parser').get_text()
-
   # separating text to single words (tokenization)
-  words = word_tokenize(text)
+  words = word_tokenize(BeautifulSoup(text, 'html.parser').get_text())
   
   # deleting stop words
   eng_stop_words = set(stopwords.words("english"))
@@ -77,10 +75,8 @@ def process_text(text):
   words = [word for word in words if word not in punctuations]
 
   # stemming each word (determining roots of words and slicing ends)
-  en_stemmer = PorterStemmer()
-  words = [stemmer_en.stem(word) for word in words]
-  ru_stemmer = SnowballStemmer("russian")
-  words = [stemmer_ru.stem(word) for word in words]
+  words = [PorterStemmer().stem(word) for word in words]
+  words = [SnowballStemmer("russian").stem(word) for word in words]
 
   return  ' '.join(words) 
 
@@ -167,7 +163,7 @@ def build_learning_model(df, training_columns, fillable_column):
 
 # applying a learned model to a dataframe and filling a target column
 def fill_df_with_learned_model(classifier, word_vectorizer, df, training_columns, fillable_column)
-  X = undefined_grades_df[training_columns].apply(' '.join, axis = 1)
+  X = df[training_columns].apply(' '.join, axis = 1)
   df[fillable_column] = classifier.predict(word_vectorizer.transform(X))
   return df
 
@@ -176,9 +172,9 @@ def fill_df_with_learned_model(classifier, word_vectorizer, df, training_columns
 
 #region Determining IT professions by keywords
 
-jobs_df[column.profession] = jobs_df[column.vacancy].apply(get_professions)
+jobs_df[column.profession] = jobs_df[column.vacancy].apply(get_role)
 
-def get_professions(job_name):
+def get_role(job_name):
   if (re.search('тестиров' or 'qa' and 'engineer', job_name, re.I)):
     return role.QA_engineer
   if (re.search('аналитик' or 'analyst', job_name, re.I)):
@@ -195,7 +191,7 @@ def get_professions(job_name):
     return role.frontend_developer
   if (re.search('back', job_name, re.I)):
     return role.backend_developer
-  if (re.search('full', job_name, re.I)):
+  if (re.search('full' and 'stack', job_name, re.I)):
     return role.fullstack_developer
   else:
     return 'undefined'
