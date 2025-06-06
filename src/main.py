@@ -26,15 +26,15 @@ def acquire_data(spec_name, country_name, role_nums):
     ''' Saving the final dataframe to CSV-file '''
 
     # selecting the crucial columns
-    df = df[[   Column.ID,
-                Column.ROLE,
-                Column.DESCRIPTION,
-                Column.KEY_SKILLS, 
-                Column.EXPERIENCE,
-                Column.SALARY,
-                Column.SCHEDULE,
-                Column.REGION,
-                Column.EMPLOYER,
+    df = df[[   Column.ID.value,
+                Column.ROLE.value,
+                Column.DESCRIPTION.value,
+                Column.KEY_SKILLS.value,
+                Column.EXPERIENCE.value,
+                Column.SALARY.value,
+                Column.SCHEDULE.value,
+                Column.REGION.value,
+                Column.EMPLOYER.value
             ]]
     df.to_csv(f'{input("Enter a dataframe name to save")}.csv', index = False, header = True, sep=',')
 
@@ -43,40 +43,50 @@ def acquire_data(spec_name, country_name, role_nums):
 def run_analysis(df):
 
     # deleting extra columns, replacing NaN values to 0 and setting column data types to exclude errors during analysis
-    df = df.drop('Unnamed: 0', 1).fillna(0).astype({ Column.SALARY:'int64', Column.ROLE:'string', Column.KEY_SKILLS:'string' })
+    df = df.drop('Unnamed: 0', 1).fillna(0).astype({
+                                                        Column.SALARY.value:'int64',
+                                                        Column.ROLE.value:'string',
+                                                        Column.KEY_SKILLS.value:'string'
+                                                   })
 
     ''' Data analysis '''
 
     # preliminary processing text via NLP
-    df[Column.ROLE] = df[Column.ROLE].apply(process_via_NLP)
-    df[Column.KEY_SKILLS] = df[Column.KEY_SKILLS].apply(process_via_NLP)
-    df[Column.EXPERIENCE] = df[Column.EXPERIENCE].apply(process_via_NLP)
+    df[Column.ROLE.value] = df[Column.ROLE.value].apply(process_via_NLP)
+    df[Column.KEY_SKILLS.value] = df[Column.KEY_SKILLS.value].apply(process_via_NLP)
+    df[Column.EXPERIENCE.value] = df[Column.EXPERIENCE.value].apply(process_via_NLP)
 
     # determining IT professions by keywords
-    df[Column.ROLE] = df[Column.ROLE].apply(get_role)
+    df[Column.ROLE.value] = df[Column.ROLE.value].apply(get_role)
 
     # determining professional grades by keywords
-    df[Column.GRADE] = df[Column.ROLE].apply(get_grade)
+    df[Column.GRADE.value] = df[Column.ROLE.value].apply(get_grade)
 
     #region Determining professional grades via machine learning (classification method)
 
     # separating the dataframe to defined and undefined grades for further analysis
-    defined_grades_df = df[df[Column.GRADE] != 'undefined']
-    undefined_grades_df = df[df[Column.GRADE] == 'undefined']
+    defined_grades_df = df[df[Column.GRADE.value] != 'undefined']
+    undefined_grades_df = df[df[Column.GRADE.value] == 'undefined']
 
     # learning regularities and building the learning model based on previously defined grades and acquired data -
     # ('role', 'experience', 'key_skills' columns)
     classifier, word_vectorizer = build_learning_model(defined_grades_df,
-                                                        [Column.ROLE, Column.EXPERIENCE, Column.KEY_SKILLS],
-                                                        Column.GRADE
+                                                        [Column.ROLE.value,
+                                                         Column.EXPERIENCE.value,
+                                                         Column.KEY_SKILLS.value
+                                                        ],
+                                                        Column.GRADE.value
                                                       )
 
     # applying the learned model to "undefined grades" dataframe and filling the 'grade' column
     emulated_grades_df = fill_df_with_learned_model(classifier,
                                                     word_vectorizer,
                                                     undefined_grades_df,
-                                                    [Column.ROLE, Column.EXPERIENCE, Column.KEY_SKILLS], 
-                                                    Column.GRADE
+                                                    [Column.ROLE.value,
+                                                     Column.EXPERIENCE.value,
+                                                     Column.KEY_SKILLS.value
+                                                    ], 
+                                                    Column.GRADE.value
                                                    )
     # getting the full graded dataframe
     df = pd.concat([defined_grades_df, emulated_grades_df])
