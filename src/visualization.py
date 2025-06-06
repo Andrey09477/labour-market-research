@@ -16,66 +16,92 @@ def run_visualization(df):
   """ Regional salaries """
 
   # filtering null values by salaries and regions for correct analytical data calculation
-  filtered_region_df = df[(df[Column.SALARY] != 0) & (df[Column.REGION] != '0')]
+  filtered_region_df = df[(df[Column.SALARY.value] != 0) & (df[Column.REGION.value] != '0')]
 
   # scatter plot "Salaries offered in regions"
-  filtered_region_df.plot(x = Column.SALARY, y = Column.REGION, kind = 'scatter', s = 100, figsize = (10, 10))
+  filtered_region_df.plot(x = Column.SALARY.value, y = Column.REGION.value, kind = 'scatter', s = 100, figsize = (10, 10))
 
   # mean values of regional salaries
-  count_mean_values(filtered_region_df, Column.REGION, Column.SALARY)
+  count_mean_values(filtered_region_df, Column.REGION.value, Column.SALARY.value)
 
   # median values of regional salaries
-  count_median_values(filtered_region_df, Column.REGION, Column.SALARY)
+  count_median_values(filtered_region_df, Column.REGION.value, Column.SALARY.value)
 
   # maximum values of regional salaries
-  filtered_region_df.groupby(Column.REGION)[Column.SALARY].max().sort_values()
+  filtered_region_df.groupby(Column.REGION.value)[Column.SALARY.value].max().sort_values()
 
   """ Salaries relating to professional grades """
 
   # filtering null values by salaries only
-  filtered_salary_df = df[df[Column.SALARY] != 0]
+  filtered_salary_df = df[df[Column.SALARY.value] != 0]
 
   # plot "Scatter and average values of offered salaries relating to professional grades
-  sns.catplot(x = Column.SALARY, y = Column.GRADE, kind = 'bar', data = filtered_salary_df.sort_values(Column.GRADE, ascending = False), size = 5)
+  sns.catplot(
+    kind = 'bar',
+    size = 5,
+    x = Column.SALARY.value,
+    y = Column.GRADE.value,
+    data = filtered_salary_df.sort_values(Column.GRADE.value, ascending = False)
+  )
 
   # plot "Range/scatter of offered salaries relating to professional grades
   # (the less values in single range, the thinner and lighter figure and wider dispersion)
-  sns.catplot(x = Column.SALARY, y = Column.GRADE, kind='boxen', data = filtered_salary_df.sort_values(Column.GRADE, ascending = False), height = 6, aspect = 2/1)
+  sns.catplot(
+    kind='boxen',
+    height = 6,
+    aspect = 2/1,
+    x = Column.SALARY.value,
+    y = Column.GRADE.value,
+    data = filtered_salary_df.sort_values(Column.GRADE.value, ascending = False)
+  )
 
   # mean values of salaries relating to grades
-  count_mean_values(filtered_salary_df, Column.GRADE, Column.SALARY)
+  count_mean_values(filtered_salary_df, Column.GRADE.value, Column.SALARY.value)
 
   # median values of salaries relating to grades
-  count_median_values(filtered_salary_df, Column.GRADE, Column.SALARY)
+  count_median_values(filtered_salary_df, Column.GRADE.value, Column.SALARY.value)
 
   """ Salaries and percentage of jobs relating to required experience """
 
   # plot "Range/scatter of offered salaries relating to required experience"
   # (the more values in single range, the longer lines and wider dispersion)
-  sns.catplot(x = Column.SALARY, y = Column.EXPERIENCE, kind = 'box', data = filtered_salary_df.sort_values(Column.EXPERIENCE), height = 5, aspect = 2/1)
+  sns.catplot(
+    kind = 'box',
+    height = 5,
+    aspect = 2/1,
+    x = Column.SALARY.value,
+    y = Column.EXPERIENCE.value,
+    data = filtered_salary_df.sort_values(Column.EXPERIENCE.value)
+  )
 
   # mean values of salaries relating to required experience
-  count_mean_values(filtered_salary_df, Column.EXPERIENCE, Column.SALARY)
+  count_mean_values(filtered_salary_df, Column.EXPERIENCE.value, Column.SALARY.value)
 
   # median values of salaries relating to required experience
-  count_median_values(filtered_salary_df, Column.EXPERIENCE, Column.SALARY)
+  count_median_values(filtered_salary_df, Column.EXPERIENCE.value, Column.SALARY.value)
 
   # plot "Percentage of offered jobs relating to required experience"
-  plot_count_chart(Column.EXPERIENCE, df, 'Percentage of jobs')
+  plot_count_chart(Column.EXPERIENCE.value, df, 'Percentage of jobs')
 
   # percentage of offered jobs relating to required experience
-  count_percentage(Column.EXPERIENCE, df)
+  count_percentage(Column.EXPERIENCE.value, df)
 
   """ Salaries relating to IT professions """
 
   # plot "Scatter and average values of offered salaries relating to IT professions"
-  sns.catplot(x = Column.SALARY, y = Column.ROLE, kind = 'bar', data = filtered_salary_df.sort_values(Column.SALARY), aspect = 2/1)
+  sns.catplot(
+    kind = 'bar',
+    aspect = 2/1,
+    x = Column.SALARY.value,
+    y = Column.ROLE.value,
+    data = filtered_salary_df.sort_values(Column.SALARY.value)
+  )
 
   # mean values of salaries relating to professions
-  count_mean_values(filtered_salary_df, Column.ROLE, Column.SALARY)
+  count_mean_values(filtered_salary_df, Column.ROLE.value, Column.SALARY.value)
 
   # median values of salaries relating to professions
-  count_median_values(filtered_salary_df, Column.ROLE, Column.SALARY)
+  count_median_values(filtered_salary_df, Column.ROLE.value, Column.SALARY.value)
 
   """ Most in-demand skills relating to IT professions """
 
@@ -86,21 +112,39 @@ def run_visualization(df):
   """ Salaries and percentage of jobs relating to work schedule """
 
   # plot "Scatter of offered salaries relating to work schedule"
-  sns.catplot(x = Column.SALARY, y = Column.SCHEDULE, data = filtered_salary_df, size = 10, height = 5, aspect = 2/1)
+  sns.catplot(
+    size = 10,
+    height = 5,
+    aspect = 2/1,
+    x = Column.SALARY.value,
+    y = Column.SCHEDULE.value,
+    data = filtered_salary_df
+  )
 
   # plot "Percentage of offered jobs relating to work schedule"
-  plot_count_chart(Column.SCHEDULE, df, 'Percentage of jobs')
+  plot_count_chart(Column.SCHEDULE.value, df, 'Percentage of jobs')
 
   # percentage of offered jobs relating to work schedule
-  count_percentage(Column.SCHEDULE, df)
+  count_percentage(Column.SCHEDULE.value, df)
 
   """ Salaries and number of jobs offered by employers """
 
   # plot "Top 10 employers offering higher salaries"
-  sns.catplot(x = Column.SALARY, y = Column.EMPLOYER, kind='bar', height = 5, aspect = 2/1, data = filtered_salary_df.sort_values(Column.SALARY).tail(10))
+  sns.catplot(
+    kind='bar',
+    height = 5,
+    aspect = 2/1,
+    x = Column.SALARY.value,
+    y = Column.EMPLOYER.value,
+    data = filtered_salary_df.sort_values(Column.SALARY.value).tail(10)
+  )
 
   # plot "Top 10 employers offering more jobs"
-  ax = sns.countplot(y = Column.EMPLOYER, data = df, order = pd.value_counts(df[Column.EMPLOYER]).iloc[:10].index)
+  ax = sns.countplot(
+    y = Column.EMPLOYER.value,
+    data = df,
+    order = pd.value_counts(df[Column.EMPLOYER.value]).iloc[:10].index
+  )
   plt.xlabel('Number of jobs')
 
 #endregion
@@ -109,8 +153,8 @@ def run_visualization(df):
 
 # getting most in-demand skills for certain profession
 def get_top_ten_skills(df, role):
-  df = df[df[Column.ROLE] == role]
-  skills = df[Column.KEY_SKILLS].to_list()
+  df = df[df[Column.ROLE.value] == role]
+  skills = df[Column.KEY_SKILLS.value].to_list()
 
   # getting a list of abbreviations
   tokenized_skills = [word_tokenize(skill) for skill in skills]
